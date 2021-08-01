@@ -1,0 +1,35 @@
+# importing the libraries
+import cv2 as cv
+import pytesseract as pt
+
+# seting the path of pytesseract exe
+# you have to write the location of file on which your tesseract was installed
+pt.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+
+#Address can also be given as
+# pt.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
+# Now we will read the image in our program
+# you have to put your image path in place of texts.jpg
+img = cv.imread('texts.jpg')
+
+# Our image will read as BGR format,
+# So we will convert in RGB format because tesseract can only read in RGB format
+img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+h_img, w_img, no_of_channels = img.shape
+
+confg = r'--oem 3 --psm 6 outputbase digits'
+boxes = pt.image_to_data(img, config=confg)      
+print(boxes)
+
+for x, b in enumerate(boxes.splitlines()):  
+    if x!= 0:     
+        b = b.split()
+        if len(b)==12:
+            print(b[11])
+            x,y,w,h = int(b[6]), int(b[7]), int(b[8]), int(b[9])
+            cv.rectangle(img, (x,y), (x+w,y+h), (0,0,255), 2)   
+            cv.putText(img, b[11], (x, y), cv.FONT_HERSHEY_COMPLEX, 1, (0,0,255), 1)   
+
+cv.imshow("result", img)
+cv.waitKey(0)
